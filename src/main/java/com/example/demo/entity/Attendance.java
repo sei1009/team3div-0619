@@ -21,4 +21,5 @@ public class Attendance {
 	private LocalDate date;
 	private int user_id;
 	private int request_id;
+
 }
