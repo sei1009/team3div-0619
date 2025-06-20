@@ -1,5 +1,11 @@
 package com.example.demo.dao;
 
-public class Requestdao {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.example.demo.entity.Request;
+
+@Repository
+public interface Requestdao extends JpaRepository<Request, Long> {
 
 }

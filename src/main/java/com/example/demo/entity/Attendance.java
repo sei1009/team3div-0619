@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -15,10 +18,12 @@ import lombok.Data;
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @Table(name = "attendance")
 public class Attendance {
-	private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	private LocalTime start_time;
 	private LocalTime end_time;
 	private LocalDate date;
-	private int user_id;
-	private int request_id;
+	private long userid;
+	private Long requestid;
 }
