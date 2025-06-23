@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,7 +43,18 @@ public class UserController {
 
 	@PostMapping("/attendance/{id}")
 	public Attendance attendancereturn(@RequestBody Map<String, String> dateMap, @PathVariable long id) {
-		String stdate = dateMap.get("date");
+//		System.out.println(dateMap.get("punchDate"));
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//		
+//		
+//		
+		String stdate = dateMap.get("punchDate");
 		LocalDate date = LocalDate.parse(stdate);
 
 		return attendancedao.findByUseridAndDate(id, date);
@@ -52,13 +64,13 @@ public class UserController {
 	public Attendance clockIn(@PathVariable long id, @RequestBody Map<String, String> body) {
 		String timeStr = body.get("time");
 		String dateStr = body.get("date");
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
+//		System.out.println();
 		System.out.println("受け取ったJSON: " + body);
 		LocalDate date = LocalDate.parse(dateStr);
 		Attendance att = attendancedao.findByUseridAndDate(id, date);
@@ -90,6 +102,24 @@ public class UserController {
 
 		att.setEnd_time(entime);
 		return attendancedao.save(att);
+	}
+	
+	@PutMapping("/request/{id}")
+	public Request updateRequest(@PathVariable Long id, @RequestBody Request updated) {
+	    Request existing = requestdao.findById(id)
+	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+	    existing.setLate(updated.getLate());
+	    existing.setLate_app(updated.getLate_app());
+	    existing.setEarly(updated.getEarly());
+	    existing.setEarly_app(updated.getEarly_app());
+	    existing.setAbsence(updated.getAbsence());
+	    existing.setAbsence_app(updated.getAbsence_app());
+	    existing.setPaid(updated.getPaid());
+	    existing.setPaid_app(updated.getPaid_app());
+
+	    
+	    return requestdao.save(existing);
 	}
 
 }
