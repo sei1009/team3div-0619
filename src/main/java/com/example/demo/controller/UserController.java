@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,9 +35,39 @@ public class UserController {
 		this.attendancedao = attendancedao;
 	}
 
+	@PutMapping("/request/{id}")
+	public Request updateRequest(@PathVariable Long id, @RequestBody Request updated) {
+		Request existing = requestdao.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+		if (updated.getAbsence() == 1) {
+			existing.setAbsence(updated.getAbsence());
+		}
+		if (updated.getEarly() == 1) {
+			existing.setEarly(updated.getEarly());
+
+		}
+		if (updated.getLate() == 1) {
+
+			existing.setLate(updated.getLate());
+		}
+		if (updated.getPaid() == 1) {
+
+			existing.setPaid(updated.getPaid());
+		}
+
+		return requestdao.save(existing);
+	}
+
 	@GetMapping("/request/{id}")
 	public Request requestreturn(@PathVariable Long id) {
 		return requestdao.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "リクエストが見つかりません"));
+	}
+
+	@GetMapping("/attendance/{id}")
+	public Attendance attendancereturn(@PathVariable Long id) {
+		return attendancedao.findByRequestid(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "リクエストが見つかりません"));
 	}
 
@@ -103,13 +134,7 @@ public class UserController {
 			newreq.setUserid(id);
 			Request savedReq = requestdao.save(newreq);
 			System.out.println("新規リクエストID: " + savedReq.getId());
-			System.out.println(savedReq.getId());
-			System.out.println(savedReq.getUserid());
-			System.out.println(savedReq.getId());
-			System.out.println(savedReq.getUserid());
-			System.out.println(savedReq.getId());
-			System.out.println(savedReq.getUserid());
-			System.out.println(savedReq.getId());
+
 			System.out.println(savedReq.getUserid());
 			Attendance newAtt = new Attendance();
 			newAtt.setUserid(id);
