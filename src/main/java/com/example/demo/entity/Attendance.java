@@ -24,6 +24,6 @@ public class Attendance {
 	private LocalTime start_time;
 	private LocalTime end_time;
 	private LocalDate date;
-	private Long userid;
+	private long userid;
 	private Long requestid;
 }
