@@ -42,7 +42,7 @@ public class UserController {
 
 	@PostMapping("/attendance/{id}")
 	public Attendance attendancereturn(@RequestBody Map<String, String> dateMap, @PathVariable long id) {
-		String stdate = dateMap.get("date");
+		String stdate = dateMap.get("punchDate");
 		LocalDate date = LocalDate.parse(stdate);
 
 		return attendancedao.findByUseridAndDate(id, date);
@@ -90,6 +90,33 @@ public class UserController {
 
 		att.setEnd_time(entime);
 		return attendancedao.save(att);
+	}
+
+	@PostMapping("/check/{id}")
+	public void checkrequest(@RequestBody Map<String, String> dateMap, @PathVariable Long id) {
+		String stdate = dateMap.get("punchDate");
+		LocalDate date = LocalDate.parse(stdate);
+
+		Attendance att = attendancedao.findByUseridAndDate(id, date);
+		if (att == null) {
+			Request newreq = new Request();
+			newreq.setUserid(id);
+			Request savedReq = requestdao.save(newreq);
+			System.out.println("新規リクエストID: " + savedReq.getId());
+			System.out.println(savedReq.getId());
+			System.out.println(savedReq.getUserid());
+			System.out.println(savedReq.getId());
+			System.out.println(savedReq.getUserid());
+			System.out.println(savedReq.getId());
+			System.out.println(savedReq.getUserid());
+			System.out.println(savedReq.getId());
+			System.out.println(savedReq.getUserid());
+			Attendance newAtt = new Attendance();
+			newAtt.setUserid(id);
+			newAtt.setDate(date);
+			newAtt.setRequestid(savedReq.getId()); // ← 自動採番IDをセット
+			attendancedao.save(newAtt);
+		}
 	}
 
 }

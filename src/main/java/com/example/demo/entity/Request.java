@@ -17,7 +17,7 @@ import lombok.Data;
 public class Request {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	private int paid;
 	private int early;
 	private int absence;
@@ -26,4 +26,5 @@ public class Request {
 	private int early_app;
 	private int absence_app;
 	private int late_app;
+	private Long userid;
 }
