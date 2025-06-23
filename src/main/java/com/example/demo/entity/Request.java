@@ -26,4 +26,5 @@ public class Request {
 	private int early_app;
 	private int absence_app;
 	private int late_app;
+	private Long userid;
 }
