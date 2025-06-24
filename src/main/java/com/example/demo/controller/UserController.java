@@ -42,21 +42,26 @@ public class UserController {
 		Request existing = requestdao.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-		if (updated.getAbsence() == 1) {
-			existing.setAbsence(updated.getAbsence());
-		}
-		if (updated.getEarly() == 1) {
-			existing.setEarly(updated.getEarly());
-
-		}
-		if (updated.getLate() == 1) {
-
-			existing.setLate(updated.getLate());
-		}
-		if (updated.getPaid() == 1) {
-
-			existing.setPaid(updated.getPaid());
-		}
+		//		if (updated.getAbsence() == 1) {
+		//			existing.setAbsence(updated.getAbsence());
+		//		}
+		//		if (updated.getEarly() == 1) {
+		//			existing.setEarly(updated.getEarly());
+		//
+		//		}
+		//		if (updated.getLate() == 1) {
+		//
+		//			existing.setLate(updated.getLate());
+		//		}
+		//		if (updated.getPaid() == 1) {
+		//
+		//			existing.setPaid(updated.getPaid());
+		//		}
+		//０・１の両方セットできる
+		existing.setAbsence(updated.getAbsence());
+		existing.setEarly(updated.getEarly());
+		existing.setLate(updated.getLate());
+		existing.setPaid(updated.getPaid());
 
 		return requestdao.save(existing);
 	}
