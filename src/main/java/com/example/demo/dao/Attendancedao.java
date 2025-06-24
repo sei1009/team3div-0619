@@ -1,6 +1,7 @@
 package com.example.demo.dao;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,6 @@ public interface Attendancedao extends JpaRepository<Attendance, Long> {
 	Attendance findByUseridAndDate(long id, LocalDate date);
 
 	Optional<Attendance> findByRequestid(Long id);
+
+	List<Attendance> findByUseridAndDateBetween(Long id, LocalDate start, LocalDate end);
 }
