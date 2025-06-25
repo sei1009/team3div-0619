@@ -148,8 +148,10 @@ public class UserController {
 			@PathVariable Long id,
 			@RequestParam String month // 形式: "2025-06"
 	) {
+		System.out.println("ID=" + id);
 		// 年と月に分解
 		String[] parts = month.split("-");
+
 		int year = Integer.parseInt(parts[0]);
 		int monthValue = Integer.parseInt(parts[1]);
 
@@ -159,7 +161,8 @@ public class UserController {
 
 		// DBから該当範囲の出退勤記録を取得
 		List<Attendance> list = attendancedao.findByUseridAndDateBetween(id, start, end);
-
+		System.out.println("取得対象: " + start + " ～ " + end);
+		System.out.println("件数: " + list.size());
 		// レスポンス形式を整える
 		List<Map<String, Object>> response = new java.util.ArrayList<>();
 		for (Attendance att : list) {
