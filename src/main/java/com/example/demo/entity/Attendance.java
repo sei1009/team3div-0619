@@ -1,5 +1,8 @@
 package com.example.demo.entity;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,14 +16,14 @@ import lombok.Data;
 @Data
 @Entity
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-@Table(name = "users")
-public class Users {
+@Table(name = "attendance")
+public class Attendance {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String username;
-	private String password;
-
-	private String email;
-	private int category_id;
+	private LocalTime start_time;
+	private LocalTime end_time;
+	private LocalDate date;
+	private long userid;
+	private Long requestid;
 }

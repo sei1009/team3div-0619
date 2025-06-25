@@ -13,14 +13,18 @@ import lombok.Data;
 @Data
 @Entity
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-@Table(name = "users")
-public class Users {
+@Table(name = "request")
+public class Request {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	private String username;
-	private String password;
-
-	private String email;
-	private int category_id;
+	private long id;
+	private int paid;
+	private int early;
+	private int absence;
+	private int late;
+	private int paid_app;
+	private int early_app;
+	private int absence_app;
+	private int late_app;
+	private Long userid;
 }
