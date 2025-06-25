@@ -14,7 +14,7 @@ import com.example.demo.entity.Users;
 import com.example.demo.service.LoginService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin
 public class LoginController {
 
 	private final LoginService loginService;
