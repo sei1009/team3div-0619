@@ -17,4 +17,9 @@ public interface Attendancedao extends JpaRepository<Attendance, Long> {
 	Optional<Attendance> findByRequestid(Long id);
 
 	List<Attendance> findByUseridAndDateBetween(Long id, LocalDate start, LocalDate end);
+
+	List<Attendance> findAllByRequestid(Long id);
+
+	List<Attendance> findByUserid(Long id);
+
 }
