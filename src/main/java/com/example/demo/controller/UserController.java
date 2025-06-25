@@ -2,8 +2,11 @@ package com.example.demo.controller;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -177,6 +180,44 @@ public class UserController {
 		}
 
 		return response;
+	}
+	
+	@GetMapping("/request/user/details/{userId}")
+	public List<Map<String, Object>> getRequestsWithAttendance(@PathVariable Long userId) {
+	    List<Request> requests = requestdao.findByUserid(userId);
+	    List<Map<String, Object>> result = new ArrayList<>();
+
+	    for (Request req : requests) {
+	        Map<String, Object> map = new HashMap<>();
+
+	        List<String> contents = new ArrayList<>();
+	        if (req.getPaid() == 1) contents.add("有給");
+	        if (req.getEarly() == 1) contents.add("早退");
+	        if (req.getAbsence() == 1) contents.add("欠勤");
+	        if (req.getLate() == 1) contents.add("遅刻");
+	        if (contents.isEmpty()) {
+	            // 申請内容がないのでこのリクエストはスキップ
+	            continue;
+	        }
+	        
+	        String status = "申請中";
+	        int maxStatus = Math.max(
+	            Math.max(req.getPaid_app(), req.getEarly_app()),
+	            Math.max(req.getAbsence_app(), req.getLate_app())
+	        );
+	        if (maxStatus == 1) status = "承認";
+	        else if (maxStatus == 2) status = "却下";
+
+	        Optional<Attendance> attOpt = attendancedao.findByRequestid(req.getId());
+
+	        map.put("requestId", req.getId());
+	        map.put("content", String.join(", ", contents));
+	        map.put("status", status);
+	        map.put("date", attOpt.map(att -> att.getDate().toString()).orElse("日付なし"));
+
+	        result.add(map);
+	    }
+	    return result;
 	}
 
 }
