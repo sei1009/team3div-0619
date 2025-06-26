@@ -22,4 +22,6 @@ public interface Attendancedao extends JpaRepository<Attendance, Long> {
 
 	List<Attendance> findByUserid(Long id);
 
+	List<Attendance> findByRequestidIsNull();
+
 }

@@ -2,8 +2,12 @@ package com.example.demo.controller;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,6 +26,7 @@ import com.example.demo.dao.Requestdao;
 import com.example.demo.dao.Usersdao;
 import com.example.demo.entity.Attendance;
 import com.example.demo.entity.Request;
+import com.example.demo.entity.Users;
 
 @CrossOrigin
 @RestController
@@ -42,26 +47,33 @@ public class UserController {
 		Request existing = requestdao.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-		//		if (updated.getAbsence() == 1) {
-		//			existing.setAbsence(updated.getAbsence());
-		//		}
-		//		if (updated.getEarly() == 1) {
-		//			existing.setEarly(updated.getEarly());
-		//
-		//		}
-		//		if (updated.getLate() == 1) {
-		//
-		//			existing.setLate(updated.getLate());
-		//		}
-		//		if (updated.getPaid() == 1) {
-		//
-		//			existing.setPaid(updated.getPaid());
-		//		}
+		if (updated.getPaid() == 1 && existing.getPaid() == 0) {
+			//Usersから有給残日数を取得
+			Users user = usersdao.findById(existing.getUserid())
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザーが見つかりません"));
+			//有給残日数の値が0以下か確認
+			if (user.getPaidDate() <= 0) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "有給残日数がありません。");
+			}
+
+			user.setPaidDate(user.getPaidDate() - 1); // 1日減らす
+			usersdao.save(user);
+		}
+		// 有給申請を取り消す（1 → 0）
+		if (updated.getPaid() == 0 && existing.getPaid() == 1) {
+			//Usersから有給残日数を取得
+			Users user = usersdao.findById(existing.getUserid())
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザーが見つかりません"));
+
+			user.setPaidDate(user.getPaidDate() + 1); // 1日戻す
+			usersdao.save(user);
+		}
 		//０・１の両方セットできる
 		existing.setAbsence(updated.getAbsence());
 		existing.setEarly(updated.getEarly());
 		existing.setLate(updated.getLate());
 		existing.setPaid(updated.getPaid());
+		existing.setReason(updated.getReason());
 
 		return requestdao.save(existing);
 	}
@@ -176,6 +188,70 @@ public class UserController {
 			response.add(item);
 		}
 
+		return response;
+	}
+
+	@GetMapping("/request/user/details/{userId}")
+	public List<Map<String, Object>> getRequestsWithAttendance(@PathVariable Long userId) {
+		List<Request> requests = requestdao.findByUserid(userId);
+		List<Map<String, Object>> result = new ArrayList<>();
+
+		for (Request req : requests) {
+			Map<String, Object> map = new HashMap<>();
+
+			List<String> contents = new ArrayList<>();
+			if (req.getPaid() == 1)
+				contents.add("有給");
+			if (req.getEarly() == 1)
+				contents.add("早退");
+			if (req.getAbsence() == 1)
+				contents.add("欠勤");
+			if (req.getLate() == 1)
+				contents.add("遅刻");
+			if (contents.isEmpty()) {
+				// 申請内容がないのでこのリクエストはスキップ
+				continue;
+			}
+
+			String status = "申請中";
+			int maxStatus = Math.max(
+					Math.max(req.getPaid_app(), req.getEarly_app()),
+					Math.max(req.getAbsence_app(), req.getLate_app()));
+			if (maxStatus == 1)
+				status = "承認";
+			else if (maxStatus == 2)
+				status = "却下";
+
+			Optional<Attendance> attOpt = attendancedao.findByRequestid(req.getId());
+
+			map.put("requestId", req.getId());
+			map.put("content", String.join(", ", contents));
+			map.put("status", status);
+			map.put("date", attOpt.map(att -> att.getDate().toString()).orElse("日付なし"));
+			map.put("reason", req.getReason());
+			result.add(map);
+		}
+		//日付けの昇順でソート
+		result.sort(Comparator.comparing(m -> {
+			String dateStr = (String) m.get("date");
+			try {
+				return LocalDate.parse(dateStr);
+			} catch (Exception e) {
+				return LocalDate.MAX; // パース失敗（例: "日付なし"）は末尾に
+			}
+		}));
+
+		return result;
+	}
+
+	// ✅ 新規追加：ユーザーIDから有給残日数を取得するエンドポイント
+	@GetMapping("/user/{userId}/paidDate")
+	public Map<String, Object> getPaidDateByUserId(@PathVariable Long userId) {
+		Users user = usersdao.findById(userId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザーが見つかりません"));
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("paidDate", user.getPaidDate());
 		return response;
 	}
 

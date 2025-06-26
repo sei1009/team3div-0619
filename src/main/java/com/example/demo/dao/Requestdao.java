@@ -10,4 +10,5 @@ import com.example.demo.entity.Request;
 @Repository
 public interface Requestdao extends JpaRepository<Request, Long> {
 	List<Request> findByUserid(Long userId);
+
 }
