@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -217,6 +218,16 @@ public class UserController {
 
 	        result.add(map);
 	    }
+	    //日付けの昇順でソート
+	    result.sort(Comparator.comparing(m -> {
+	        String dateStr = (String) m.get("date");
+	        try {
+	            return LocalDate.parse(dateStr);
+	        } catch (Exception e) {
+	            return LocalDate.MAX; // パース失敗（例: "日付なし"）は末尾に
+	        }
+	    }));
+
 	    return result;
 	}
 
