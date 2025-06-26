@@ -285,7 +285,7 @@ public class UserController {
 	    if (att == null) {
 	        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "該当日の勤怠が存在しません。");
 	    }
-
+	    
 	    att.setAttendance_situation(situation);
 	    return attendancedao.save(att);
 	}

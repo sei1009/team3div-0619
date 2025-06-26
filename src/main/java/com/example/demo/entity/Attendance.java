@@ -28,4 +28,5 @@ public class Attendance {
 	private long userid;
 	private Long requestid;
 	private String attendance_situation;
+	
 }
