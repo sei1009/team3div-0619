@@ -24,6 +24,7 @@ public class Attendance {
 	private LocalTime start_time;
 	private LocalTime end_time;
 	private LocalDate date;
+	private int evaluation; // 評価: 1=悪い, 2=普通, 3=良い
 	private long userid;
 	private Long requestid;
 }
