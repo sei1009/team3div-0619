@@ -27,4 +27,5 @@ public class Attendance {
 	private int evaluation; // 評価: 1=悪い, 2=普通, 3=良い
 	private long userid;
 	private Long requestid;
+	private String attendance_situation;
 }

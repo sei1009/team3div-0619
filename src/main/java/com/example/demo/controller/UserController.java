@@ -269,5 +269,25 @@ public class UserController {
 	    att.setEvaluation(evaluation);
 	    return attendancedao.save(att);
 	}
+	
+	@PutMapping("/attendance/situation/{id}")
+	public Attendance updateAttendanceSituation(@PathVariable long id, @RequestBody Map<String, String> body) {
+	    String dateStr = body.get("date");
+	    String situation = body.get("attendance_situation");
+
+	    if (dateStr == null || situation == null) {
+	        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "dateとattendance_situationが必要です");
+	    }
+
+	    LocalDate date = LocalDate.parse(dateStr);
+	    Attendance att = attendancedao.findByUseridAndDate(id, date);
+
+	    if (att == null) {
+	        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "該当日の勤怠が存在しません。");
+	    }
+
+	    att.setAttendance_situation(situation);
+	    return attendancedao.save(att);
+	}
 
 }
