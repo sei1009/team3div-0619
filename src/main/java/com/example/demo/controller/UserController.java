@@ -26,6 +26,7 @@ import com.example.demo.dao.Requestdao;
 import com.example.demo.dao.Usersdao;
 import com.example.demo.entity.Attendance;
 import com.example.demo.entity.Request;
+import com.example.demo.entity.Users;
 
 @CrossOrigin
 @RestController
@@ -45,22 +46,28 @@ public class UserController {
 	public Request updateRequest(@PathVariable Long id, @RequestBody Request updated) {
 		Request existing = requestdao.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		// 有給申請が 0 → 1 になった場合
+	    if (updated.getPaid() == 1 && existing.getPaid() == 0) {
+	    	//Usersから有給残日数を取得
+	        Users user = usersdao.findById(existing.getUserid())
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザーが見つかりません"));
+	        //有給残日数の値が0以下か確認
+	        if (user.getPaidDate() <= 0) {
+	            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "有給残日数がありません。");
+	        }
 
-		//		if (updated.getAbsence() == 1) {
-		//			existing.setAbsence(updated.getAbsence());
-		//		}
-		//		if (updated.getEarly() == 1) {
-		//			existing.setEarly(updated.getEarly());
-		//
-		//		}
-		//		if (updated.getLate() == 1) {
-		//
-		//			existing.setLate(updated.getLate());
-		//		}
-		//		if (updated.getPaid() == 1) {
-		//
-		//			existing.setPaid(updated.getPaid());
-		//		}
+	        user.setPaidDate(user.getPaidDate() - 1); // 1日減らす
+	        usersdao.save(user);
+	    }
+	    // 有給申請を取り消す（1 → 0）
+	    if (updated.getPaid() == 0 && existing.getPaid() == 1) {
+	    	//Usersから有給残日数を取得
+	        Users user = usersdao.findById(existing.getUserid())
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザーが見つかりません"));
+
+	        user.setPaidDate(user.getPaidDate() + 1); // 1日戻す
+	        usersdao.save(user);
+	    }
 		//０・１の両方セットできる
 		existing.setAbsence(updated.getAbsence());
 		existing.setEarly(updated.getEarly());
@@ -229,6 +236,17 @@ public class UserController {
 	    }));
 
 	    return result;
+	}
+	
+	// ✅ 新規追加：ユーザーIDから有給残日数を取得するエンドポイント
+	@GetMapping("/user/{userId}/paidDate")
+	public Map<String, Object> getPaidDateByUserId(@PathVariable Long userId) {
+	    Users user = usersdao.findById(userId)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザーが見つかりません"));
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("paidDate", user.getPaidDate());
+	    return response;
 	}
 
 }
