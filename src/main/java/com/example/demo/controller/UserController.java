@@ -62,6 +62,7 @@ public class UserController {
 		existing.setEarly(updated.getEarly());
 		existing.setLate(updated.getLate());
 		existing.setPaid(updated.getPaid());
+		existing.setReason(updated.getReason());
 
 		return requestdao.save(existing);
 	}
